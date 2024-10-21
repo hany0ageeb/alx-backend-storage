@@ -26,6 +26,7 @@ def main():
         {"$group": {"_id": "$method", "count": {"$sum": 1}}}
     ]
     result = list(nginx.aggregate(pipeline))
+    print("Methods:")
     for method in methods:
         count = 0
         f_result = list(filter(lambda x: x['_id'] == method, result))
