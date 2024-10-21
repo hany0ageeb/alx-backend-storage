@@ -35,4 +35,5 @@ def main():
         print("    method {}: {}".format(method, count))
 
 
-main()
+if __name__ == '__main__':
+    main()
