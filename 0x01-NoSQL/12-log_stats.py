@@ -32,7 +32,7 @@ def main():
         f_result = list(filter(lambda x: x['_id'] == method, result))
         if f_result:
             count = f_result[0]['count']
-        print("    method {}: {}".format(method, count))
+        print("\tmethod {}: {}".format(method, count))
 
 
 if __name__ == '__main__':
