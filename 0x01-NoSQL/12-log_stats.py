@@ -40,6 +40,8 @@ def main():
     result = list(nginx.aggregate(pipeline))
     if result:
         print("{} status check".format(result[0].get('count', 0)))
+    else:
+        print("{} status check".format(0))
 
 
 if __name__ == '__main__':
