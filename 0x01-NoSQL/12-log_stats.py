@@ -33,6 +33,13 @@ def main():
         if f_result:
             count = f_result[0]['count']
         print("\tmethod {}: {}".format(method, count))
+    pipeline = [
+        {"$match": {"$and": [{"method": "GET"}, {"path": "/status"}]}},
+        {"$group": {"_id": None, "count": {"$sum": 1}}}
+    ]
+    result = list(nginx.aggregate(pipeline))
+    if result:
+        print("{} status check".format(result[0].get('count', 0)))
 
 
 if __name__ == '__main__':
