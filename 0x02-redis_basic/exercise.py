@@ -34,6 +34,21 @@ def count_calls(method: Callable) -> Callable:
     return wrapper
 
 
+def call_history(method: Callable) -> Callable:
+    """
+    call_history
+    """
+    @wraps(method)
+    def wrapper(*args, **kwargs):
+        inputs = [str(arg) for arg in args[1:]] + \
+            [v for k, v in kwargs.items() if k != 'self']
+        args[0].rpush("{}:inputs".format(method.__qualname__), *inputs)
+        output = [method(*args, **kwargs)]
+        args[0].rpush("{}:outputs".format(method.__qualname__), *output)
+        return output
+    return wrapper
+
+
 class Cache:
     """
     Cache class.
@@ -44,6 +59,7 @@ class Cache:
         self._redis.flushdb()
 
     @count_calls
+    @call_history
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
         takes a data argument and returns a string.
@@ -85,3 +101,7 @@ class Cache:
         wrapper around Redis.incr method
         """
         self._redis.incr(key)
+
+    def rpush(self, name: str, *args) -> None:
+        """Wrapper around Redis.rpush"""
+        self._redis.rpush(name, *args)
