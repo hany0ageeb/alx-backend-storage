@@ -16,6 +16,22 @@ Remember that data can be a str, bytes, int or float.
 import redis
 import uuid
 from typing import Union, Callable, Any
+from functools import wraps
+
+
+def count_calls(method: Callable) -> Callable:
+    """
+    As a key, use the qualified name of method
+    using the __qualname__ dunder method.
+    Create and return function that increments the count
+    for that key every time the method is called
+    and returns the value returned by the original method.
+    """
+    @wraps(method)
+    def wrapper(*args, **kwargs):
+        args[0].incr(method.__qualname__)
+        return method(*args, **kwargs)
+    return wrapper
 
 
 class Cache:
@@ -27,6 +43,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
         takes a data argument and returns a string.
@@ -62,3 +79,9 @@ class Cache:
         wrapper that call self.get and convert to int
         """
         return self.get(key, lambda value: int(value))
+
+    def incr(self, key: str) -> None:
+        """
+        wrapper around Redis.incr method
+        """
+        self._redis.incr(key)
