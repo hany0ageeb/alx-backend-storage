@@ -19,6 +19,20 @@ from typing import Union, Callable, Any
 from functools import wraps
 
 
+def replay(method: Callable) -> None:
+    """
+    display the history of calls of a particular function.
+    """
+    r = redis.Redis(decode_responses=True)
+    key = method.__qualname__
+    call_count = r.get(key)
+    print("{} was called {} times:".format(key, call_count))
+    inputs = r.lrange("{}:inputs".format(key), 0, -1)
+    outputs = r.lrange("{}:outputs".format(key), 0, -1)
+    for in_out in zip(inputs, outputs):
+        print("{}(*({},)) -> {}".format(key, in_out[0], in_out[1]))
+
+
 def count_calls(method: Callable) -> Callable:
     """
     As a key, use the qualified name of method
