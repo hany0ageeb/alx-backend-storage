@@ -82,7 +82,12 @@ class Cache:
         return the key
         """
         key: str = str(uuid.uuid4())
-        self._redis.set(key, data)
+        if type(data) in [str, bytes, int, float]:
+            self._redis.set(key, data)
+        elif type(data) is list:
+            self._redis.lpush(key, *data)
+        elif type(data) is set:
+            self._redis.sadd(key, *data)
         return key
 
     def get(self,
