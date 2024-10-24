@@ -69,7 +69,7 @@ class Cache:
     """
 
     def __init__(self) -> None:
-        self._redis = redis.Redis()
+        self._redis = redis.Redis(decode_responses=True)
         self._redis.flushdb()
 
     @count_calls
